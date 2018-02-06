@@ -149,10 +149,12 @@ def next_frame(x1,y1,elements):
         y2 = element["y"]
         if(abs(math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)))) < 8:#minimalna distanca
             ret_Val.append(element)
+
     return ret_Val
 
 def dot_distance(x1,x2,y1,y2):
     d = abs(math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)))
+
     return d
 
 def retun_passed_lines(lines,x,y):
@@ -171,71 +173,101 @@ def return_value(Y_value):
         if Y_value[0,i] == 1:
             return i
 
-def check_dot(lines,x,y):
-    for line in lines:
-        k = line["k"]
-        n = line["n"]
-        result = abs(k*x+n-y)
-        if(result < 8):#u pravom zivotu treba = 0, ispunjenje jednacine prave ali odsekao sam delove pa radim aproksimaciju
-            if(x>=line["x1"] and x<=line["x2"]):
-                if(y>=line["y1"] and y<=line["y2"]):
-                    return line["id"]
+def check_dot(line,x,y,mode):
+    passedLines = []
+    result_threshold = 0
+    if mode == 1:
+        result_threshold = 5
+    if mode == 2:
+        result_threshold = 15
+    k = line["k"]
+    n = line["n"]
+    result = abs(k*x+n-y)
+
+    if(result < result_threshold):#u pravom zivotu treba = 0, ispunjenje jednacine prave ali odsekao sam delove pa radim aproksimaciju
+        if(x>=line["x1"] and x<=line["x2"]):
+            if(y>=line["y1"] and y<=line["y2"]):
+                return line["id"]
+
     return None
-def line_cross(lines,xcenter,ycenter):
 
-    x1 = xcenter - 14
-    y1 = ycenter - 14
-    result1 = check_dot(lines,x1,y1)
-    if (result1 is not None):
-        return result1
+def line_cross(lines,xcenter,ycenter,mode,dxc,dyc):
 
-    x2 = xcenter - 14
-    y2 = ycenter + 14
-    result2 = check_dot(lines,x2,y2)
-    if (result2 is not None):
-        return result2
+    returnLines = []
+    xp = dxc /2
+    yp = dyc /2
 
-    x3 = xcenter + 14
-    y3 = ycenter - 14
-    result3 = check_dot(lines,x3,y3)
-    if (result3 is not None):
-        return result3
+    x1 = xcenter - xp
+    y1 = ycenter - yp
+    for line in lines:
+        result1 = check_dot(line,x1,y1,mode)
+        if (result1 is not None):
+            if result1 not in returnLines:
+                returnLines.append(result1)
 
-    x4 = xcenter + 14
-    y4 = ycenter + 14
-    result4 = check_dot(lines,x4,y4)
-    if(result4 is not None):
-        return result4
+    x2 = xcenter - xp
+    y2 = ycenter + yp
+    for line in lines:
+        result2 = check_dot(line,x2,y2,mode)
+        if (result2 is not None):
+            if result2 not in returnLines:
+                returnLines.append(result2)
+
+    x3 = xcenter + xp
+    y3 = ycenter - yp
+    for line in lines:
+        result3 = check_dot(line,x3,y3,mode)
+        if (result3 is not None):
+            if result3 not in returnLines:
+                returnLines.append(result3)
+
+    x4 = xcenter + xp
+    y4 = ycenter + yp
+    for line in lines:
+        result4 = check_dot(line,x4,y4,mode)
+        if(result4 is not None):
+            if result4 not in returnLines:
+                returnLines.append(result4)
 
     x5 = xcenter
     y5 = ycenter
-    result5 = check_dot(lines, x4, y4)
-    if (result5 is not None):
-        return result5
+    for line in lines:
+        result5 = check_dot(line, x5, y5,mode)
+        if (result5 is not None):
+            if result5 not in returnLines:
+                returnLines.append(result5)
 
-    x6 = xcenter + 14
+    x6 = xcenter + xp
     y6 = ycenter
-    result6 = check_dot(lines, x4, y4)
-    if (result6 is not None):
-        return result6
+    for line in lines:
+        result6 = check_dot(line, x6, y6,mode)
+        if (result6 is not None):
+            if result6 not in returnLines:
+                returnLines.append(result6)
 
-    x7 = xcenter - 14
+    x7 = xcenter - xp
     y7 = ycenter
-    result7 = check_dot(lines, x4, y4)
-    if (result7 is not None):
-        return result7
+    for line in lines:
+        result7 = check_dot(line, x7, y7,mode)
+        if (result7 is not None):
+            if result7 not in returnLines:
+                returnLines.append(result7)
 
     x8 = xcenter
-    y8 = ycenter + 14
-    result8 = check_dot(lines, x4, y4)
-    if (result8 is not None):
-        return result8
+    y8 = ycenter + yp
+    for line in lines:
+        result8 = check_dot(line, x8, y8,mode)
+        if (result8 is not None):
+            if result8 not in returnLines:
+                returnLines.append(result8)
 
     x9 = xcenter
-    y9 = ycenter - 14
-    result9 = check_dot(lines, x4, y4)
-    if (result9 is not None):
-        return result9
+    y9 = ycenter - yp
+    for line in lines:
+        result9 = check_dot(line, x9, y9,mode)
+        if (result9 is not None):
+            if result9 not in returnLines:
+                returnLines.append(result9)
 
 
     '''
@@ -243,7 +275,26 @@ def line_cross(lines,xcenter,ycenter):
         # print ('x1 y1 pipnuo '+str(x1)+' | '+str(y1))
         return True
     '''
-    return None
+    if len(returnLines) == 0:
+        return None
+    else:
+        return returnLines
+
+def get_parnet(number,numbers):
+    lowestDistance = 0;
+    returnID = 0
+    for n in numbers:
+        if number["id"] != n["id"]:
+            distance = dot_distance(number["x"],n["x"],number["y"],n["y"])
+            if distance > 20:
+                if lowestDistance == 0:
+                    lowestDistance = distance
+                    returnID = n["id"]
+                elif distance < lowestDistance:
+                    lowestDistance = distance
+                    returnID = n["id"]
+
+    return {"id":returnID,"distance":lowestDistance}
 
 def test_model(model):
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -317,19 +368,26 @@ selfi = cv2.imread(impath)
 lower = np.array([180, 180, 180])
 upper = np.array([255, 255, 255])
 
+oldFrames =[]
 lineEquations = []
 numbers=[]
 number_cnt = 0
 result = 0
 frame_counter= 0
 cap = cv2.VideoCapture(path)
+numberID = 1
+vuksa = False
 while(True):
     ret, frame = cap.read()
+    vuksa = False
     start_time = time.time()
     frame_counter = frame_counter +1
     if frame_counter == 1:
         lineEquations = find_lines(frame)
         print (lineEquations)
+
+    if frame_counter > 1:
+        oldFrames = numbers
 
     counter = 0;
     mask = cv2.inRange(frame, lower, upper)
@@ -338,71 +396,137 @@ while(True):
     label_im, nb_labels = ndimage.label(res)
     objects = ndimage.find_objects(label_im)
 
+    k=0
     for i in range(nb_labels):
         loc = objects[i]
         (xc, yc) = ((loc[1].stop + loc[1].start) / 2,(loc[0].stop + loc[0].start) / 2)#sredina(loc[0].stop + loc[0].start) / 2)
         (dxc, dyc) = (loc[1].stop - loc[1].start,(loc[0].stop - loc[0].start))
         if(yc>14 and yc < frame.shape[0]-14 and xc>14 and xc<frame.shape[1]-14):
             if (dxc > 12 or dyc > 12):
-                #cv2.circle(res, (xc, yc), 16, (25, 25, 255), 1)
+                k = k+1
+                cv2.circle(frame, (xc, yc), 2, (25, 25, 255), 2)
 
                 candidates = next_frame(xc,yc,numbers)
-
                 if(len(candidates) == 0):
 
-                    maci = res[yc-14:yc+14, xc-14:xc+14]
-                    macigray = cv2.cvtColor(maci, cv2.COLOR_BGR2GRAY)
-                    maci_computed = compute_image(macigray)
-                    maci_test = maci_computed.reshape(1, 1, maci_computed.shape[0], maci_computed.shape[1])
-                    prediction = model.predict(maci_test)
-                    newelement = {"x":xc,"y":yc,"value":return_value(prediction),"timestamp":start_time,"transform":0}
-                    newelement["passed"] = retun_passed_lines(lineEquations,xc,yc)
-                    numbers.append(newelement)
-                    #print('added'+str(newelement["value"]))
+                    if line_cross(lineEquations,xc,yc,2,dxc,dyc) is None:
+                        notNumberFlag = False
+                        maci = res[yc-14:yc+14, xc-14:xc+14]
+                        macigray = cv2.cvtColor(maci, cv2.COLOR_BGR2GRAY)
+                        maci_computed = compute_image(macigray)
+                        maci_test = maci_computed.reshape(1, 1, maci_computed.shape[0], maci_computed.shape[1])
+                        prediction = model.predict(maci_test)
+                        if(return_value(prediction) != None):
+                            #print prediction
+                            '''
+                            if(return_value(prediction) == 3):
+                                cv2.imshow('hiii',maci)
+                            '''
+                            #print model.evaluate(maci_test,prediction,10)
+                            newelement = {"id":numberID,"x":xc,"y":yc,"value":return_value(prediction),"timestamp":start_time,"transform":0,"myFrame":frame_counter,"originalValue":return_value(prediction),
+                                          "dxc":dxc,"dyc":dyc}
+                            newelement["closest"] = {}
+                            newelement["covered"] = []
+                            newelement["passed"] = retun_passed_lines(lineEquations,xc,yc)
 
-                if(len(candidates) == 1):
+                            '''
+                            #funckija preklapanja
+                            for number in numbers:
+                                if dot_distance(number["x"],newelement["x"],number["y"],newelement["y"]) < 28:
+                                    #vuksa = True
+                                    #cv2.rectangle(frame, (xc - 14, yc - 14), (xc + 14, yc + 14), (255, 255, 0), 2)
+                                    if len(number["covered"]) > 0:
+                                        temp = number["covered"][0]
+                                        number["covered"].remove(temp)
+                                        number["value"] -= temp["value"]
+                                        newelement["originalValue"] = temp["value"]
+                                        newelement["value"] = temp["value"]
+                            '''
+
+                            numbers.append(newelement)
+                            numberID = numberID + 1
+                            print('added'+str(newelement["value"]))
+                            vuksa = True
+                            cv2.rectangle(frame,(xc-14,yc-14),(xc+14,yc+14),(255,255,0),2)
+
+                if(len(candidates) > 0):
                     for number in numbers:
                         if(number == candidates[0]):
                             number["transform"] = number["transform"] + start_time
                             number["x"] = xc
                             number["y"] = yc
                             number["timestamp"] = start_time
-                            if number["transform"]>1:
-                                maci = res[yc - 14:yc + 14, xc - 14:xc + 14]
-                                macigray = cv2.cvtColor(maci, cv2.COLOR_BGR2GRAY)
-                                maci_computed = compute_image(macigray)
-                                maci_test = maci_computed.reshape(1, 1, maci_computed.shape[0],maci_computed.shape[1])
-                                prediction = model.predict(maci_test)
-                                number["value"] = return_value(prediction)
-                                number["transform"] = 0
-                            linepassed = line_cross(lineEquations,xc,yc)
+                            number["myFrame"] = frame_counter
+                            '''
+                            if number["transform"]>3:
+                                if line_cross(lineEquations,number["x"],number["y"],1) is None:
+                                    maci = res[yc - 14:yc + 14, xc - 14:xc + 14]
+                                    macigray = cv2.cvtColor(maci, cv2.COLOR_BGR2GRAY)
+                                    maci_computed = compute_image(macigray)
+                                    maci_test = maci_computed.reshape(1, 1, maci_computed.shape[0],maci_computed.shape[1])
+                                    prediction = model.predict(maci_test)
+                                    number["originalValue"] = return_value(prediction)
+                                    number["value"] = number["originalValue"]
+
+                                    for covered in number["covered"]:
+                                        number["value"] += covered["value"]
+                                    number["transform"] = 0
+                            '''
+                            linepassed = line_cross(lineEquations,xc,yc,1,dxc,dyc)
                             if linepassed is not None:
-                                flag = False
-                                for line in number["passed"]:
-                                    if line == linepassed :
-                                        flag = True
-                                        #print('areadly pasesd')
-                                if flag == False:
-                                    number["passed"].append(linepassed)
-                                    for line in lineEquations:
-                                        if line["id"] == linepassed:
-                                            if line["color"] == 'blue':
-                                                result = result + number["value"]
-                                                #print('sabiranje')
-                                            else:
-                                                result = result - number["value"]
-                                                #print('oduzimanje')
+                                for lineresult in linepassed:
+                                    flag = False
+                                    for line in number["passed"]:
+                                        if line == lineresult :
+                                            flag = True
+                                            #print('already pasesd')
+                                    if flag == False:
+                                        number["passed"].append(lineresult)
+                                        for line in lineEquations:
+                                            if line["id"] == lineresult:
+                                                if line["color"] == 'blue':
+                                                    result = result + number["value"]
+                                                    #print('sabiranje dodato' + str(number["value"]))
+                                                else:
+                                                    result = result - number["value"]
+                                                    #print('oduzimanje oduzeto'+ str(number["value"]))
                 #if(len(candidates)>1):
                     #print'prekpalanja'
 
-                for number in numbers:
-                    if start_time - number["timestamp"] > 3:
-                        numbers.remove(number)
-                        #print 'Izbrisao'+str(number["value"])
+
+    for number in numbers:
+        newelement["closest"] = get_parnet(number,numbers)
+
+    coveredUp = []
+    for number in numbers:
+        if frame_counter - number["myFrame"] > 8:
+            #pod 1, ako prelazi liniju, brisem
+            if line_cross(lineEquations,number["x"],number["y"],2,number["dxc"],number["dyc"]) is not None:
+                numbers.remove(number)
+                #print 'Obrisao jer je presao liniju'
+                break
+            if number["x"] > frame.shape[1] - 50 or number["y"] > frame.shape[0] - 50:
+                numbers.remove(number)
+                #print 'Obrisao jer je ispao iz frejma'
+                break
+            else:
+                #odkloni za preklop
+                #coveredUp.append(number)
+                numbers.remove(number)
+                print 'Obrisao jer je preklopljen'
+            #print 'Izbrisao' + str(number["value"])
+
+    for covered in coveredUp:
+        for number in numbers:
+            if number["id"] == covered["closest"]["id"]:
+                number["covered"].append(covered)
+                number["value"] += covered["value"]
 
     cv2.putText(frame, 'Result: '+ str(result), (95, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 90, 255), 1)
+    if vuksa:
+        print 'chaoo'
     cv2.imshow('frame',frame)
-
+    #cv2.imshow('res',res)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 cv2.waitKey(0)
